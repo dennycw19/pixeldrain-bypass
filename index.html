@@ -23,10 +23,22 @@
                 <textarea name="" id="url-input" placeholder="One url per-line..." class="border border-gray-300 p-2 rounded-md w-full text-white bg-gray-500"></textarea>
             </div>
             <div class="flex md:items-center w-full md:w-auto mt-2">
-                <button class="flex items-center justify-center bg-slate-500 text-white p-2 rounded-md text-center w-full text-shadow-lg hover:bg-slate-600
-                ">Bypass <span class="material-symbols-outlined">step_over</span></button>
+                <button id="bypass-button" onclick="generateBypass()" class="flex items-center justify-center bg-slate-500 text-white p-2 rounded-md text-center w-full text-shadow-lg hover:bg-slate-600
+                ">
+                    <svg id="spinner" class="animate-spin h-5 w-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle>
+                        <path d="M4 12a8 8 0 018-8" stroke-width="4" class="opacity-75"></path>
+                    </svg>
+                    <span id="button-text">Bypass</span>
+                    <span class="material-symbols-outlined">step_over</span>
+                </button>
             </div>
         </form>
+
+        <section id="output-container" class="mt-6 hidden">
+            <div id="message-box" class="m-4 rounded text-sm"></div>
+            <div id="result-container" class="space-y-4"></div>
+        </section>
         
         <footer class="mt-4">
             <p class="text-sm text-white text-center">Made with ❤️ by NeoCortexx</p>
