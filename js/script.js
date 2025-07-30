@@ -1,6 +1,9 @@
 async function generateBypass() {
     const urlInput = document.getElementById('url-input').value.trim();
-    const urls = urlInput.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const urls = urlInput
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
     
     const outputContainer = document.getElementById('output-container');
     const messageBox = document.getElementById('message-box');
@@ -8,7 +11,9 @@ async function generateBypass() {
     const buttonText = document.getElementById('button-text');
     const bypassButton = document.getElementById('bypass-button');
     const spinner = document.getElementById('spinner');
-
+    
+    console.log("URL Input:", urlInput);
+    console.log("Parsed URLs:", urls);
 
     buttonText.textContent = 'Bypassing...';
     spinner.classList.remove('hidden');
@@ -27,24 +32,32 @@ async function generateBypass() {
         bypassButton.disabled = false;
         return;
     }
-
+    console.log("Number of URLs to process:", urls.length);
     let successCount = 0;
 
     for (const url of urls){
+        console.log("Processing URL:", url);
         try{
-            const response = await fetch("/", {
+            const response = await fetch("./php/bypass.php", {
                 method: "POST",
                 headers:{"Content-Type": "application/json"},
                 body: JSON.stringify({url}),
             });
+            if(response.ok) console.log("Successfully fetched bypass data for URL:", url);
             // Check if the response is ok (status in the range 200-299)
-            if (!response.ok) continue;
+            if (!response.ok) console.error("Failed to fetch bypass data for URL:", url, "Status:", response.status);
 
             const result = await response.json();
+            console.log("Result for URL:", url, "is", result);
+
             const viewer = result.viewerData;
+
+            console.log("Viewer Data:", viewer.type, viewer.api_response);
 
             if(viewer.type === "list"){
                 const {files, title} = viewer.api_response;
+                console.log("Bypassed URLs:", files);
+                console.log("Title:", title);
                 resultContainer.innerHTML += `
                     <div class="mb-6">
                     <h2 class="text-lg font-semibold text-white">${title} Bypassed URLs:</h2>
@@ -72,7 +85,7 @@ async function generateBypass() {
                 successCount++;
             }
         } catch (error) {
-            continue;
+            console.error("Error processing URL:", url, error);
         }
     }
 
