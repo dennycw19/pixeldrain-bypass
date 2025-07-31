@@ -1,4 +1,5 @@
-async function generateBypass() {
+async function generateBypass(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
     const urlInput = document.getElementById('url-input').value.trim();
     const urls = urlInput
         .split(/\r?\n/)
@@ -11,15 +12,13 @@ async function generateBypass() {
     const buttonText = document.getElementById('button-text');
     const bypassButton = document.getElementById('bypass-button');
     const spinner = document.getElementById('spinner');
-    
-    console.log("URL Input:", urlInput);
-    console.log("Parsed URLs:", urls);
+
 
     buttonText.textContent = 'Bypassing...';
     spinner.classList.remove('hidden');
     bypassButton.disabled = true;
     outputContainer.classList.add('hidden');
-    messageBox.className = "p-3 rounded text-sm font-semibold text-center";
+    messageBox.className = "p-3 rounded text-sm font-semibold text-center mb-4";
     messageBox.textContent = "";
     resultContainer.innerHTML = "";
 
@@ -32,56 +31,63 @@ async function generateBypass() {
         bypassButton.disabled = false;
         return;
     }
-    console.log("Number of URLs to process:", urls.length);
+
     let successCount = 0;
 
     for (const url of urls){
-        console.log("Processing URL:", url);
         try{
-            const response = await fetch("./php/bypass.php", {
+            const response = await fetch("http://localhost/pixeldrain-bypass/php/bypass.php", {
                 method: "POST",
                 headers:{"Content-Type": "application/json"},
                 body: JSON.stringify({url}),
             });
-            if(response.ok) console.log("Successfully fetched bypass data for URL:", url);
-            // Check if the response is ok (status in the range 200-299)
-            if (!response.ok) console.error("Failed to fetch bypass data for URL:", url, "Status:", response.status);
+            
+            // if (!response.ok) console.error("Failed to fetch bypass data for URL:", url, "Status:", response.status);
 
             const result = await response.json();
-            console.log("Result for URL:", url, "is", result);
-
             const viewer = result.viewerData;
 
-            console.log("Viewer Data:", viewer.type, viewer.api_response);
+            if(result.limit_reached){
+                messageBox.classList.add('bg-red-500', 'text-white');
+                messageBox.textContent = "⚠️ Rate limit reached. Please try again after " + result.retry_after + " seconds.";
+                outputContainer.classList.remove('hidden');
+                buttonText.textContent = "Bypass";
+                spinner.classList.add('hidden');
+                bypassButton.disabled = false;
+                return;
+            }
 
-            if(viewer.type === "list"){
-                const {files, title} = viewer.api_response;
-                console.log("Bypassed URLs:", files);
-                console.log("Title:", title);
+            if (viewer.type === "list") {
+                const { files, title } = viewer.api_response;
                 resultContainer.innerHTML += `
                     <div class="mb-6">
-                    <h2 class="text-lg font-semibold text-white">${title} Bypassed URLs:</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${files.map((file) => `
-                            <div class="bg-gray-800 p-4 rounded-md">
-                                <h3 class="text-lg font-semibold text-white">${file.name}</h3>
-                                <p class="text-gray-400">Size: ${file.size} bytes</p>
-                                <a href="${file.url}" class="text-blue-400 hover:underline">Download</a>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>`;
+                        <h2 class="text-lg font-semibold text-white mb-1">${title}</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${files.map((file) => {
+                                const fileUrl = `https://pixeldrain.com/u/${file.id}`;
+                                const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+                                return `
+                                    <div class="bg-gray-800 p-4 rounded-md pt-4 max-w-full">
+                                        <h3 class="text-lg font-semibold text-white break-all whitespace-normal overflow-hidden">${file.name}</h3>
+                                        <p class="text-gray-400">Size: ${sizeMB} MB</p>
+                                        <a href="https://pd.cybar.xyz/${file.id}" target="_blank" class="inline-flex text-center text-white bg-blue-500 rounded hover:bg-blue-600 p-1"><span class="material-symbols-outlined">download_for_offline</span>Download</a>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>`;
                 successCount++;
             } else if(viewer.type === "file"){
                 const file = viewer.api_response;
                 resultContainer.innerHTML += `
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="p-4 bg-gray-800 rounded-md">
-                        <p class="text-sm font-semibold text-white">${file.name}</p>
-                        <p class="text-gray-400">Size: ${file.size} bytes</p>
-                        <a href="${file.url}" class="text-blue-400 hover:underline">Download</a>
-                    </div>
-                </div>`;
+                        <div class="p-4 bg-gray-800 rounded-md max-w-full">
+                            <p class="text-lg font-semibold text-white  break-all whitespace-normal overflow-hidden">${file.name}</p>
+                            <p class="text-gray-400">Size: ${(file.size/1024/1024).toFixed(2)} MB</p>
+                            <a href="https://pd.cybar.xyz/${file.id}" class="inline-flex text-center text-white bg-blue-500 rounded hover:bg-blue-600 p-1"><span class="material-symbols-outlined">download_for_offline</span>Download</a>
+                        </div>
+                    </div>`;
                 successCount++;
             }
         } catch (error) {
@@ -90,12 +96,9 @@ async function generateBypass() {
     }
 
     if (successCount > 0) {
-        // messageBox.classList.remove('hidden');
         messageBox.classList.add('bg-green-500', 'text-white');
-        messageBox.textContent = `✅ Successfully bypassed ${successCount} URL(s).`;
-        // outputContainer.classList.remove('hidden');
+        messageBox.textContent = `✅ Successfully bypassed ${successCount} of ${urls.length} URL(s).`;
     } else {
-        // messageBox.classList.remove('hidden');
         messageBox.classList.add('bg-red-500', 'text-white');
         messageBox.textContent = "⚠️ No valid Pixeldrain URLs found.";
     }
