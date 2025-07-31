@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: pixeldrain-bypass
-    env: docker
-    plan: free
-    autoDeploy: true

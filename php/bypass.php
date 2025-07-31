@@ -1,4 +1,7 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 // =============== RATE LIMITER ===============
 function rate_limit($limit, $window_seconds) {
     $ip = $_SERVER['REMOTE_ADDR'];

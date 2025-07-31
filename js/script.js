@@ -36,7 +36,7 @@ async function generateBypass(event) {
 
     for (const url of urls){
         try{
-            const response = await fetch("http://localhost/pixeldrain-bypass/php/bypass.php", {
+            const response = await fetch("https://pixeldrain-bypass.up.railway.app/php/bypass.php", {
                 method: "POST",
                 headers:{"Content-Type": "application/json"},
                 body: JSON.stringify({url}),
