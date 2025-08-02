@@ -155,7 +155,7 @@ if ($type === 'file') {
                 "type" => "zip",
                 "api_response" => [
                     "name" => $file_name, // nama file dari path ZIP
-                    // "id"   => $data['id'], // sertakan id untuk URL
+                    "id"   => $id, // sertakan id untuk URL
                     "size" => $data['size'],
                     "url"  => $path_in_zip,
                     "file_name" => urldecode($file_name),
