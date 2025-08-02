@@ -1,14 +1,15 @@
 
 # Pixeldrain URL Bypasser
 
-An easy-to-use website that fetches download URLs directly with metadata, and also avoiding Pixeldrain limitations on file and folder URLs.  Developed with HTML, PHP, JavaScript, TailwindCSS, and deployed on Railway.
+An easy-to-use website that fetches download URLs directly with metadata, and also avoids Pixeldrain limitations on file and folder URLs.  Developed with HTML, PHP, JavaScript, TailwindCSS, and deployed on Railway.
 
 
 ## Features
 
 - Can handle multiple URLs of file or folder pixeldrain per request.
 - Also can handle file and folder pixeldrain simultaneously.
-- Fetch metadata of pixeldrain URLs
+- Handle the URL file inside the zip file
+- Fetch metadata of Pixeldrain URLs
 - Simple UI and easy-to-use
 
 
