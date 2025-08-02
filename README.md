@@ -8,7 +8,7 @@ An easy-to-use website that fetches download URLs directly with metadata, and al
 
 - Can handle multiple URLs of file or folder pixeldrain per request.
 - Also can handle file and folder pixeldrain simultaneously.
-- Handle the URL file inside the zip file
+- Handles URLs pointing to files within ZIP archives, allowing individual files inside the ZIP to be downloaded directly.
 - Fetch metadata of Pixeldrain URLs
 - Simple UI and easy-to-use
 
@@ -27,7 +27,7 @@ An easy-to-use website that fetches download URLs directly with metadata, and al
 1. Go to the root directory
 
 ```bash
-# if you use laragon
+# If you use Laragon
 cd C:\laragon\www
 
 # if you use xampp
@@ -39,15 +39,23 @@ cd C:\xampp\htdocs
 ```bash
 git clone https://github.com/dennycw19/pixeldrain-bypass.git
 ```
+3. Don't forget to update the fetch URL in the JavaScript code from the deployed endpoint:
+```
+https://pixeldrain-bypass.up.railway.app/php/bypass.php
+```
+to the local path:
+```
+http://localhost/pixeldrain-bypass/php/bypass.php
+```
+This ensures the backend requests are correctly routed to your local server instead of the deployed version.
+4. Start Laragon
 
-3. Start laragon
-
-4. Open your browser at http://localhost/pixeldrain-bypass/
+5. Open your browser at http://localhost/pixeldrain-bypass/
 
 
 ## Deployment
 
-In order for this website to be deployed on Railway, it requires Docker to run PHP. The following is the Dockerfile:
+To deploy this website on Railway, PHP must run within a Docker container. The following is the Dockerfile used for this setup:
 
 ```
 # This Dockerfile sets up a PHP environment with Apache for the Pixeldrain Bypass application
