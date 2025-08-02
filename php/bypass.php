@@ -82,6 +82,18 @@ if (preg_match('/pixeldrain\.com\/u\/([a-zA-Z0-9]+)/', $url, $matches)) {
     $id = $matches[1];
     $type = 'list';
     $api_url = "https://pixeldrain.com/api/list/{$id}";
+} elseif (preg_match('/pixeldrain\.com\/api\/file\/([a-zA-Z0-9]+)\/info\/zip\/(.+)/', $url, $matches)){
+    $id = $matches[1];
+    $path_in_zip = $matches[2];
+
+    // Pisahkan path jadi folder dan file
+    $file_name = basename($path_in_zip);     // Hasil: "NCIS.S22E02.Foreign.Bodies.mkv"
+    $folder_in_zip = dirname($path_in_zip);  // Hasil: "Folder"
+
+    $type = 'zip';
+
+    // URL API untuk mengakses file dalam zip
+    $api_url = "https://pixeldrain.com/api/file/{$id}/info/zip";
 } else {
     http_response_code(400);
     echo json_encode(["error" => "Invalid Pixeldrain URL."]);
@@ -121,6 +133,39 @@ if ($type === 'file') {
             ]
         ]
     ];
+} elseif ($type === 'zip') {
+    if($folder_in_zip === '.'){
+        $result = [
+            "viewerData" => [
+                "type" => "zip",
+                "api_response" => [
+                    "name" => $file_name, // nama file dari path ZIP
+                    "id"   => $id, // sertakan id untuk URL
+                    "size" => $data['size'],
+                    "url"  => $path_in_zip,
+                    "file_name" => urldecode($file_name),
+                    "folder_in_zip" => urldecode($folder_in_zip),
+                    // "file_size" => $data['children'][urldecode($folder_in_zip)]['children'][urldecode($file_name)]['size']
+                ]
+            ]
+        ];
+    } else{
+        $result = [
+            "viewerData" => [
+                "type" => "zip",
+                "api_response" => [
+                    "name" => $file_name, // nama file dari path ZIP
+                    // "id"   => $data['id'], // sertakan id untuk URL
+                    "size" => $data['size'],
+                    "url"  => $path_in_zip,
+                    "file_name" => urldecode($file_name),
+                    "folder_in_zip" => urldecode($folder_in_zip),
+                    "file_size" => $data['children'][urldecode($folder_in_zip)]['children'][urldecode($file_name)]['size']
+                ]
+            ]
+        ];
+    }
+    
 } elseif ($type === 'list') {
     $files = array_map(function ($item) {
         return [

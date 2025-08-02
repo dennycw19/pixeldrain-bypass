@@ -37,6 +37,7 @@ async function generateBypass(event) {
     for (const url of urls){
         try{
             const response = await fetch("https://pixeldrain-bypass.up.railway.app/php/bypass.php", {
+            // const response = await fetch("http://localhost/pixeldrain-bypass/php/bypass.php", {
                 method: "POST",
                 headers:{"Content-Type": "application/json"},
                 body: JSON.stringify({url}),
@@ -89,6 +90,29 @@ async function generateBypass(event) {
                         </div>
                     </div>`;
                 successCount++;
+            } else if(viewer.type === "zip"){
+                const file = viewer.api_response;
+                if(file.folder_in_zip === "."){
+                    resultContainer.innerHTML +=`
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="p-4 bg-gray-800 rounded-md max-w-full">
+                            <p class="text-lg font-semibold text-white  break-all whitespace-normal overflow-hidden">${file.file_name}.zip</p>
+                            <p class="text-gray-400">Size: ${(file.size/1024/1024).toFixed(2)} MB</p>
+                            <a href="https://pd.cybar.xyz/${file.id}/info/zip/${file.url}" class="inline-flex text-center text-white bg-blue-500 rounded hover:bg-blue-600 p-1"><span class="material-symbols-outlined">download_for_offline</span>Download</a>
+                        </div>
+                    </div>`;
+                } else {
+                    resultContainer.innerHTML +=`
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="p-4 bg-gray-800 rounded-md max-w-full">
+                            <p class="text-lg font-semibold text-white  break-all whitespace-normal overflow-hidden">${file.file_name}</p>
+                            <p class="text-gray-400">Size: ${(file.file_size/1024/1024).toFixed(2)} MB</p>
+                            <a href="https://pd.cybar.xyz/${file.id}/info/zip/${file.url}" class="inline-flex text-center text-white bg-blue-500 rounded hover:bg-blue-600 p-1"><span class="material-symbols-outlined">download_for_offline</span>Download</a>
+                        </div>
+                    </div>`;
+                }                
+                successCount++;
+                    
             }
         } catch (error) {
             console.error("Error processing URL:", url, error);
